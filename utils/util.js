@@ -70,7 +70,7 @@ export const upload = (filePath, config) => {
  */
 export const uploadFiles = (files = []) => {
     return new Promise((resolve, reject) => {
-        promiseApi({
+        http({
             uri: '/image/config',
         }).then(res => {
             const config = res
