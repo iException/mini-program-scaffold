@@ -1,6 +1,6 @@
 # Mini Program Scaffold
 
-较之于`脚手架`， 我更愿意把它作为小程序开发的工具函数库。
+较之于 `脚手架`， 我更愿意把它作为小程序开发的工具函数库。
 
 这里默认提供了以下工具方法：
 
@@ -10,7 +10,7 @@
 - 滚动加载   `./utils/ScrollLoading.js`
 - 切换操作   `./utils/ToggleAction.js`
 - 打点函数   `./utils/tracker.js`
-- 其他的通用函数，比如微信API的Promise版本、文件上传     `./utils/util.js`
+- 其他的通用函数，比如微信API的Promise版本、文件上传    `./utils/util.js`
 
 ## 刷子 Brush
 
@@ -21,7 +21,7 @@ import Brush from '../../utils/brush'
 import { getSystemInfo } from '../../utils'
 
 getSystemInfo().then(res => {
-    const ratio = res.windowWidth / 750 // 750 是你手上设计稿中window的宽度
+    const ratio = res.windowWidth / 750 // 750 是你手上设计稿中 window 的宽度
     const brush = new Brush('canvasId', ratio)
 
     brush.save()
@@ -32,17 +32,27 @@ getSystemInfo().then(res => {
         .setFillStyle(FontColor)
         .fillText('text', 106, 144, 54)
         .restore()
+
+    brush.save(false).then(res => {
+        return canvasToTempFilePath({
+            canvasId: 'canvasId'
+        })
+    }).then(res => {
+        console.log(res)
+    }).catch(err => {})
 })
 ```
 如果已经正确设置比例 `ratio` ，那么绘制的时候就可以原封不动地向 API 传入设计图的参数。
-
-> 前提是canvas的宽度已经被设置为 `windowWidth`，否则计算 `ratio` 时分子应该是 `canvas` 的实际宽度。
 
 比如要画一张图片，设计稿宽度是750px, 图片是 750px × 750px，canvas 要铺满整个屏幕宽度，widowWidth: 375px，那么 ratio = 375 / 750, API 调用为：
 
 ```javascript
     brush.drawImage(`imagePath`, 0, 0, 750, 750, 0, 0, 750, 750)
 ```
+
+> 前提是canvas的宽度已经被设置为 `windowWidth`，否则计算 `ratio` 时分子应该是 `canvas` 的实际宽度。
+
+> 如果要绘制多个圆形图片，建议启用一个新的canvas，并将图片保存使用（微信小程序 canvas 对于多个裁剪区域的处理有异常，头铁当我没有说过）。欢迎提供更好的建议😀
 
 ## 配置 Config
 

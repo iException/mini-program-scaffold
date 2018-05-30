@@ -20,8 +20,9 @@ export default class Brush {
     }
 
     draw (save = true) {
-        this.ctx.draw(save)
-        return this
+        return new Promise((resolve, reject) => {
+            this.ctx.draw(save, resolve)
+        })
     }
 
     /**
@@ -167,5 +168,14 @@ export default class Brush {
      */
     formatParmas (val, startIndex = 0) {
         return val.map((v, index) => isNaN(v) || index < startIndex ? v : v * this.ratio)
+    }
+
+    clearActions () {
+        this.ctx.clearActions()
+        return this
+    }
+
+    getActions () {
+        return this.ctx.getActions()
     }
 }
