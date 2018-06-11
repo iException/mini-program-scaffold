@@ -1,5 +1,4 @@
 import { HTTP } from './config'
-import D from './date'
 import qs from "./qs";
 
 const md5 = require('./md5')
@@ -115,7 +114,10 @@ export const log = {
 }
 
 export const gotoPage = (route, params = '', method = 'navigateTo') => {
-    const list = ['index']
+    if (typeof params === 'object') {
+        params = qs.stringify(params)
+    }
+    const list = ['index', 'create-moment', 'user-info']
     if (list.find(r => r === route)) {
         method = 'switchTab'
     }
@@ -127,9 +129,30 @@ export const gotoPage = (route, params = '', method = 'navigateTo') => {
         wx[method]({
             url: url
         })
+    }, 0)
+}
+
+export const alertAndGoBack = (msg) => {
+    confirm({
+        showCancel: false,
+        content: msg || ''
+    }).then(res => {
+        goBack()
+    }).catch(err => {
+        goBack()
     })
 }
 
+export const alertAndGoto = (msg, page, method) => {
+    confirm({
+        showCancel: false,
+        content: msg || ''
+    }).then(res => {
+        gotoPage(page, '', method)
+    }).catch(err => {
+        gotoPage(page, '', method)
+    })
+}
 
 export const showActionSheet = (list = []) => {
     return new Promise((resolve, reject) => {
@@ -188,21 +211,6 @@ export const wxOpenSetting = () => {
         wx.openSetting({
             success: resolve,
             fail: reject
-        })
-    })
-}
-
-export const alertAndGoBack = (msg) => {
-    confirm({
-        showCancel: false,
-        content: msg || ''
-    }).then(res => {
-        wx.navigateBack({
-            delta: 1
-        })
-    }).catch(err => {
-        wx.navigateBack({
-            delta: 1
         })
     })
 }
@@ -316,4 +324,78 @@ export const extractSourceFromOptions = (options = {}) => {
     return {
         ...source_params_obj
     }
+}
+
+
+export const compressSourceScenne = (qrCodeScene = {}) => {
+    return objectEntries(qrCodeScene).reduce((prev, next) => `${prev ? prev + ';' : prev}${next.join(':')}`, '')
+}
+
+/**
+ * iOS 10.3 及以下不支持 Object.entries ，所以这里加个 polyfill
+ * @param obj
+ * @returns {Array}
+ */
+export const objectEntries = (obj) => {
+    const entires = []
+
+    for (let key in obj) {
+        if (obj.hasOwnProperty(key) && obj.propertyIsEnumerable(key)) {
+            entires.push([key, obj[key]])
+        }
+    }
+
+    return entires
+}
+
+export const showTabBar = (obj) => {
+    return new Promise((success, fail) => {
+        wx.showTabBar({
+            ...obj,
+            success,
+            fail
+        })
+    })
+}
+
+export const hideTabBar = (obj) => {
+    return new Promise((success, fail) => {
+        wx.hideTabBar({
+            ...obj,
+            success,
+            fail
+        })
+    })
+}
+
+export const setClipboardData = (data) => {
+    return new Promise((success, fail) => {
+        wx.setClipboardData({
+            data,
+            success,
+            fail
+        })
+    })
+}
+
+export const getClipboardData = () => {
+    return new Promise((success, fail) => {
+        wx.getClipboardData({
+            success,
+            fail
+        })
+    })
+}
+
+export const getCurrentPage = () => {
+    return getCurrentPages().slice().pop()
+}
+
+export const chooseAddress = () => {
+    return new Promise((success, fail) => {
+        wx.chooseAddress({
+            success,
+            fail
+        })
+    })
 }
