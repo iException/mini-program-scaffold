@@ -1,11 +1,13 @@
-/**
- * 滚动加载
- */
 export default class ScrollLoading {
     constructor () {
         this.page = 1           // 当前页码
         this.loading = false    // loading 状态
         this.disabled = false   // 是否停用
+        this.eventHub = {
+            loading: [],
+            loaded: [],
+            end: []
+        }
     }
 
     reset (page = 1) {
@@ -27,6 +29,7 @@ export default class ScrollLoading {
                 reject('disabled')
                 return
             }
+            this.emit('loading')
             handler(this.page).then(res => {
                 this.page++
                 this.loading = false
@@ -35,12 +38,41 @@ export default class ScrollLoading {
                 // 等待 reset
                 if (Array.isArray(res) && res.length === 0) {
                     this.disabled = true
+                    this.emit('end')
                 }
                 resolve(res)
+                this.emit('loaded')
             }).catch(err => {
                 this.loading = false
                 reject(err)
+                this.emit('loaded')
             })
         })
+    }
+
+    subscribe (eventType, handler) {
+        if (typeof handler === 'function') {
+            this.eventHub[eventType].push(handler)
+        }
+    }
+
+    unSubscribe (eventType, handler) {
+        if (typeof handler === 'function') {
+            const eventHub = this.eventHub[eventType]
+            for (let i = 0; i < eventHub.length; i++) {
+                if (eventHub[i] === handler) {
+                    eventHub.splice(i, 1)
+                }
+            }
+        } else {
+            this.eventHub[eventType] = []
+        }
+    }
+
+    emit (eventType) {
+        const eventHub = this.eventHub[eventType]
+        for (let i = 0; i < eventHub.length; i++) {
+            eventHub[i]()
+        }
     }
 }

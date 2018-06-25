@@ -399,3 +399,71 @@ export const chooseAddress = () => {
         })
     })
 }
+
+export const showShareMenu = () => {
+    return new Promise((success, fail) => {
+        wx.showShareMenu({
+            success,
+            fail
+        })
+    })
+}
+
+export const hideShareMenu = () => {
+    return new Promise((success, fail) => {
+        wx.hideShareMenu({
+            success,
+            fail
+        })
+    })
+}
+
+export const wxGetFileInfo = (config) => {
+    return new Promise((success, fail) => {
+        wx.getFileInfo({
+            ...config,
+            success,
+            fail
+        })
+    })
+}
+
+export const wxChooseVideo = (config) => {
+    return new Promise((success, fail) => {
+        wx.chooseVideo({
+            ...config,
+            success,
+            fail
+        })
+    })
+}
+
+export const wxChooseImage = (config) => {
+    return new Promise((success, fail) => {
+        wx.chooseImage({
+            ...config,
+            success,
+            fail
+        })
+    })
+}
+
+/**
+ * Verify that file size is less than specified value
+ * @param {*} config
+ */
+export const validateFileSize = (config) => {
+    return new Promise((resolve, reject) => {
+        wxGetFileInfo({
+            filePath: config.path
+        }).then(res => {
+            if (res.size < config.size) {
+                resolve(config.path)
+            } else {
+                reject(new Error('file is too large'))
+            }
+        }).catch(err => {
+            reject(err)
+        })
+    })
+}
